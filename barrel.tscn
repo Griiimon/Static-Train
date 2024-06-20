@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://cf6cn111cquj1"]
+
+[ext_resource type="Script" path="res://my_rigidbody.gd" id="1_8chna"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_jjea5"]
+friction = 0.5
+bounce = 0.7
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tia2j"]
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wkygc"]
+albedo_color = Color(0.729186, 0.247368, 0.317147, 1)
+metallic = 0.8
+roughness = 0.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bhhqd"]
+material = SubResource("StandardMaterial3D_wkygc")
+height = 1.0
+
+[node name="Barrel" type="RigidBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55874, -4.2034)
+collision_layer = 4
+collision_mask = 29
+physics_material_override = SubResource("PhysicsMaterial_jjea5")
+can_sleep = false
+continuous_cd = true
+max_contacts_reported = 5
+contact_monitor = true
+linear_damp_mode = 1
+linear_damp = 0.6
+angular_damp_mode = 1
+angular_damp = 0.4
+script = ExtResource("1_8chna")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_tia2j")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_bhhqd")

@@ -1,0 +1,177 @@
+[gd_scene load_steps=25 format=3 uid="uid://8qts6aatonqk"]
+
+[ext_resource type="Script" path="res://ground.gd" id="1_70h7d"]
+[ext_resource type="Script" path="res://game.gd" id="1_73dwg"]
+[ext_resource type="Script" path="res://addons/ultimate_character/ucharacterbody3d.gd" id="2_m6bhw"]
+[ext_resource type="Script" path="res://train.gd" id="2_rp51w"]
+[ext_resource type="Curve" uid="uid://bavmfhqi47wvj" path="res://speed_curve.tres" id="4_lq60o"]
+[ext_resource type="PackedScene" uid="uid://cf6cn111cquj1" path="res://barrel.tscn" id="5_twgta"]
+[ext_resource type="PackedScene" uid="uid://dhj6tjwaucglt" path="res://box.tscn" id="6_qabjy"]
+
+[sub_resource type="Gradient" id="Gradient_0v2dg"]
+colors = PackedColorArray(0, 0.334051, 0, 1, 0.415686, 1, 0.415686, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_sgyw4"]
+frequency = 1.0
+fractal_octaves = 2
+fractal_lacunarity = 5.205
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_vtfwl"]
+seamless = true
+color_ramp = SubResource("Gradient_0v2dg")
+noise = SubResource("FastNoiseLite_sgyw4")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htcc7"]
+albedo_texture = SubResource("NoiseTexture2D_vtfwl")
+metallic = 1.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_lowmx"]
+material = SubResource("StandardMaterial3D_htcc7")
+size = Vector2(500, 500)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ebpmd"]
+size = Vector3(500, 0.1, 500)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r1ans"]
+size = Vector3(5, 1, 25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g2vo2"]
+albedo_color = Color(0.364084, 0.364084, 0.364084, 1)
+metallic = 0.79
+roughness = 0.53
+
+[sub_resource type="BoxMesh" id="BoxMesh_53u5k"]
+material = SubResource("StandardMaterial3D_g2vo2")
+size = Vector3(5, 1, 25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hcbjp"]
+size = Vector3(5, 10, 24.95)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_as774"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1eutw"]
+height = 1.3
+
+[sub_resource type="World3D" id="World3D_4cxd4"]
+
+[sub_resource type="Environment" id="Environment_x6kn0"]
+background_mode = 1
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_se23m"]
+size = Vector3(5000, 0.1, 5000)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wyuxo"]
+material = SubResource("StandardMaterial3D_htcc7")
+size = Vector2(500, 500)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_jikjk"]
+viewport_path = NodePath("SubViewport")
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_73dwg")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_lowmx")
+script = ExtResource("1_70h7d")
+
+[node name="StaticBody Ground" type="StaticBody3D" parent="."]
+collision_layer = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody Ground"]
+shape = SubResource("BoxShape3D_ebpmd")
+
+[node name="Train" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.33911, 0)
+script = ExtResource("2_rp51w")
+speed_curve = ExtResource("4_lq60o")
+
+[node name="Flat Car" type="StaticBody3D" parent="Train"]
+collision_layer = 8
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Train/Flat Car"]
+shape = SubResource("BoxShape3D_r1ans")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Train/Flat Car"]
+mesh = SubResource("BoxMesh_53u5k")
+
+[node name="Train Simulation Area" type="Area3D" parent="Train/Flat Car"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.55988, 0)
+collision_mask = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Train/Flat Car/Train Simulation Area"]
+shape = SubResource("BoxShape3D_hcbjp")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.03787, 0)
+collision_mask = 8
+floor_max_angle = 1.0472
+script = ExtResource("2_m6bhw")
+head_bob_intensity = 0.01
+LEFT = "left"
+RIGHT = "right"
+FORWARD = "forward"
+BACKWARD = "back"
+SPRINT = "ui_home"
+CROUCH = "ui_end"
+JUMP = "ui_select"
+
+[node name="CollisionShapeNormal" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CapsuleShape3D_as774")
+
+[node name="CollisionShapeCrouch" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.65, 0)
+shape = SubResource("CapsuleShape3D_1eutw")
+disabled = true
+
+[node name="Head" type="Node3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
+
+[node name="Camera" type="Camera3D" parent="Player/Head"]
+
+[node name="RayCast3D" type="RayCast3D" parent="Player"]
+target_position = Vector3(0, 2, 0)
+
+[node name="Barrel" parent="." instance=ExtResource("5_twgta")]
+
+[node name="Barrel2" parent="." instance=ExtResource("5_twgta")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.69803, 2.55874, -3.4925)
+
+[node name="Box" parent="." instance=ExtResource("6_qabjy")]
+
+[node name="Box2" parent="." instance=ExtResource("6_qabjy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.267299, 2.79361, -7.08757)
+
+[node name="SubViewport" type="SubViewport" parent="."]
+own_world_3d = true
+world_3d = SubResource("World3D_4cxd4")
+size = Vector2i(256, 256)
+
+[node name="Camera3D" type="Camera3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.7908, 5.92051)
+environment = SubResource("Environment_x6kn0")
+
+[node name="StaticBody Ground" type="StaticBody3D" parent="SubViewport"]
+collision_layer = 16
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewport/StaticBody Ground"]
+shape = SubResource("BoxShape3D_se23m")
+
+[node name="Ground" type="MeshInstance3D" parent="SubViewport"]
+mesh = SubResource("PlaneMesh_wyuxo")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewport"]
+transform = Transform3D(1, 0, 0, 0, -0.812969, 0.582308, 0, -0.582308, -0.812969, 0, 9.02712, 0)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 40.0
+texture = SubResource("ViewportTexture_jikjk")
+
+[connection signal="body_exited" from="Train/Flat Car/Train Simulation Area" to="." method="_on_train_simulation_area_body_exited"]
